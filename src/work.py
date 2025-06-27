@@ -52,9 +52,6 @@ class Category:
         self.__products = products if products is not None else []
         Category.category_count += 1
         Category.product_count += len(self.__products)
-        for product in self.__products:
-            if isinstance(product, Product):
-                self.add_product(product)
 
     def add_product(self, product):
         if isinstance(product, Product):
