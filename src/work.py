@@ -51,8 +51,10 @@ class Category:
         self.description = description
         self.__products = products if products is not None else []
         Category.category_count += 1
+        Category.product_count += len(self.__products)
         for product in self.__products:
-            self.add_product(product)
+            if isinstance(product, Product):
+                self.add_product(product)
 
     def add_product(self, product):
         if isinstance(product, Product):
@@ -64,4 +66,5 @@ class Category:
     @property
     def products(self):
         return "\n".join(
-            [f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт." for product in self.__products])
+            [f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт." for product in self.__products]
+        )
