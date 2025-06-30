@@ -41,6 +41,14 @@ class Product:
             products_list.append(new_product)
             return new_product
 
+    def __str__(self):
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        if isinstance(other, Product):
+            return (self.price * self.quantity) + (other.price * other.quantity)
+        return NotImplemented
+
 
 class Category:
     category_count = 0
@@ -62,6 +70,23 @@ class Category:
 
     @property
     def products(self):
-        return "\n".join(
-            [f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт." for product in self.__products]
-        )
+        return self.__products
+
+    def __str__(self):
+        return f"{self.name}, количество продуктов: {Category.product_count} шт."
+
+
+class ProductIterator:
+    def __init__(self, category):
+        self._category = category
+        self._index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index < len(self._category.products):
+            product = self._category.products[self._index]
+            self._index += 1
+            return product
+        raise StopIteration
