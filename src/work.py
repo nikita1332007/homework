@@ -41,27 +41,50 @@ class Product:
             products_list.append(new_product)
             return new_product
 
+    def __str__(self):
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        if isinstance(other, Product):
+            return (self.price * self.quantity) + (other.price * other.quantity)
+        return NotImplemented
+
 
 class Category:
     category_count = 0
-    product_count = 0
 
     def __init__(self, name, description, products=None):
         self.name = name
         self.description = description
         self.__products = products if products is not None else []
         Category.category_count += 1
-        Category.product_count += len(self.__products)
 
     def add_product(self, product):
         if isinstance(product, Product):
             self.__products.append(product)
-            Category.product_count += 1
         else:
             raise ValueError("Только объекты класса Product могут быть добавлены.")
 
     @property
     def products(self):
-        return "\n".join(
-            [f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт." for product in self.__products]
-        )
+        return self.__products
+
+    def __str__(self):
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов на складе: {total_quantity} шт."
+
+
+class ProductIterator:
+    def __init__(self, category):
+        self._category = category
+        self._index = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self._index < len(self._category.products):
+            product = self._category.products[self._index]
+            self._index += 1
+            return product
+        raise StopIteration
