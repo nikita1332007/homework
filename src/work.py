@@ -52,19 +52,16 @@ class Product:
 
 class Category:
     category_count = 0
-    product_count = 0
 
     def __init__(self, name, description, products=None):
         self.name = name
         self.description = description
         self.__products = products if products is not None else []
         Category.category_count += 1
-        Category.product_count += len(self.__products)
 
     def add_product(self, product):
         if isinstance(product, Product):
             self.__products.append(product)
-            Category.product_count += 1
         else:
             raise ValueError("Только объекты класса Product могут быть добавлены.")
 
@@ -73,7 +70,8 @@ class Category:
         return self.__products
 
     def __str__(self):
-        return f"{self.name}, количество продуктов: {Category.product_count} шт."
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов на складе: {total_quantity} шт."
 
 
 class ProductIterator:
