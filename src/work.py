@@ -23,68 +23,48 @@ class Product:
         else:
             self.__price = value
 
-    @classmethod
-    def new_product(cls, product_info, products_list):
-        existing_product = next((p for p in products_list if p.name == product_info['name']), None)
-
-        if existing_product:
-            existing_product.quantity += product_info['quantity']
-            existing_product.price = max(existing_product.price, product_info['price'])
-            return existing_product
-        else:
-            new_product = cls(
-                product_info['name'],
-                product_info['description'],
-                product_info['price'],
-                product_info['quantity']
-            )
-            products_list.append(new_product)
-            return new_product
-
-    def __str__(self):
-        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+    def add(self, other):
+        if not isinstance(other, Product):
+            raise TypeError("Нельзя складывать продукты различных классов.")
+        return (self.price * self.quantity) + (other.price * other.quantity)
 
     def __add__(self, other):
-        if isinstance(other, Product):
-            return (self.price * self.quantity) + (other.price * other.quantity)
-        return NotImplemented
+        return self.add(other)
+
+
+class Smartphone(Product):
+    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    def __init__(self, name, description, price, quantity, country, germination_period, color):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+
+        self.color = color
 
 
 class Category:
-    category_count = 0
-
     def __init__(self, name, description, products=None):
         self.name = name
         self.description = description
         self.__products = products if products is not None else []
-        Category.category_count += 1
 
     def add_product(self, product):
-        if isinstance(product, Product):
-            self.__products.append(product)
-        else:
-            raise ValueError("Только объекты класса Product могут быть добавлены.")
+        if not isinstance(product, Product):
+            raise ValueError("Только объекты класса Product и его наследников могут быть добавлены.")
+        self.__products.append(product)
 
     @property
     def products(self):
         return self.__products
 
-    def __str__(self):
-        total_quantity = sum(product.quantity for product in self.__products)
-        return f"{self.name}, количество продуктов на складе: {total_quantity} шт."
-
-
-class ProductIterator:
-    def __init__(self, category):
-        self._category = category
-        self._index = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self._index < len(self._category.products):
-            product = self._category.products[self._index]
-            self._index += 1
-            return product
-        raise StopIteration
+    @property
+    def product_count(self):
+        return len(self.__products)
