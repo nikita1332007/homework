@@ -1,9 +1,30 @@
-class Product:
+from abc import ABC, abstractmethod
+
+class LoggingMixin:
+    def __init__(self, *args, **kwargs):
+        class_name = self.__class__.__name__
+        params = ', '.join([str(arg) for arg in args] + [f"{k}={v}" for k, v in kwargs.items()])
+        print(f"Создан объект класса {class_name} с параметрами: {params}")
+        super().__init__(*args, **kwargs)
+
+
+class BaseProduct(ABC):
+    @abstractmethod
     def __init__(self, name, description, price, quantity):
         self.name = name
         self.description = description
-        self.__price = price
+        self.price = price
         self.quantity = quantity
+
+    @abstractmethod
+    def add(self, other):
+        pass
+
+
+class Product(LoggingMixin, BaseProduct):
+    def __init__(self, name, description, price, quantity):
+        self.__price = price
+        super().__init__(name, description, price, quantity)
 
     @property
     def price(self):
@@ -37,7 +58,7 @@ class Smartphone(Product):
         self.memory = memory
         self.color = color
 
-    def __add__(self, other):
+    def add(self, other):
         if isinstance(other, Smartphone):
             return self.price + other.price
         return NotImplemented
@@ -50,7 +71,7 @@ class LawnGrass(Product):
         self.germination_period = germination_period
         self.color = color
 
-    def __add__(self, other):
+    def add(self, other):
         if isinstance(other, LawnGrass):
             new_price = self.price + other.price
             new_quantity = self.quantity + other.quantity
@@ -65,8 +86,8 @@ class Category:
         self.__products = products if products is not None else []
 
     def add_product(self, product):
-        if not isinstance(product, Product):
-            raise ValueError("Только объекты класса Product и его наследников могут быть добавлены.")
+        if not isinstance(product, BaseProduct):
+            raise ValueError("Только объекты класса BaseProduct и его наследников могут быть добавлены.")
         self.__products.append(product)
 
     @property
@@ -76,3 +97,7 @@ class Category:
     @property
     def product_count(self):
         return len(self.__products)
+
+    @classmethod
+    def category_count(cls):
+        return cls.count
