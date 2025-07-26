@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class LoggingMixin:
     def __init__(self, *args, **kwargs):
         class_name = self.__class__.__name__
@@ -23,6 +24,8 @@ class BaseProduct(ABC):
 
 class Product(LoggingMixin, BaseProduct):
     def __init__(self, name, description, price, quantity):
+        if quantity <= 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен.")
         self.__price = price
         super().__init__(name, description, price, quantity)
 
@@ -89,6 +92,19 @@ class Category:
         if not isinstance(product, BaseProduct):
             raise ValueError("Только объекты класса BaseProduct и его наследников могут быть добавлены.")
         self.__products.append(product)
+
+    def middle_price(self):
+        try:
+            total_price = sum(product.price for product in self.__products)
+            if not self.__products:
+                raise ValueError("Нет товаров в категории.")
+            average = total_price / len(self.__products)
+            return average
+        except ZeroDivisionError:
+            return 0
+        except ValueError as e:
+            print(e)
+            return 0
 
     @property
     def products(self):
