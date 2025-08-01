@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 from io import StringIO
-
 from src.work import Category, Product, LawnGrass, Smartphone
 
 
